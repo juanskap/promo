@@ -16,7 +16,7 @@ $cardUrl = url('staff/index.php?code=' . urlencode((string)$customer['code']));
 $qrSrc   = 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=' . rawurlencode($cardUrl);
 $shareText = '¡Te invito a ' . setting('business_name', 'Mi Cabaña') . '! 🍲 Regístrate con mi código '
     . $customer['code'] . ' y empieza a llenar tu tarjeta: '
-    . url('index.php?tab=registro&ref=' . urlencode((string)$customer['code']));
+    . url('tarjeta.php?tab=registro&ref=' . urlencode((string)$customer['code']));
 
 page_start('Mi tarjeta', 'public');
 ?>

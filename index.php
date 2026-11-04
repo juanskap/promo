@@ -2,149 +2,128 @@
 declare(strict_types=1);
 require __DIR__ . '/includes/app.php';
 
-if (current_customer()) {
-    redirect('card.php');
-}
-
-$tab    = ($_GET['tab'] ?? 'login') === 'registro' ? 'registro' : 'login';
-$errors = [];
-$loginPhone = '';
-$regName = '';
-$regPhone = '';
-$referral  = trim((string)($_GET['ref'] ?? ''));
-$business  = setting('business_name', 'Mi Cabaña');
+$business  = setting('business_name', 'Cabaña Delfina');
+$tagline   = setting('tagline', 'Calentito, nutritivo y hecho con amor para ti');
+$heroText  = setting('hero_text', 'Caldo de salchicha tradicional, casero y con ingredientes seleccionados. Ideal para días fríos, almuerzos y para compartir en familia.');
+$price     = setting('price_caldo', '$3.500');
+$address   = setting('address', 'Guaranda, Bolívar');
+$hours     = setting('hours', 'Sábados');
+$delivery  = setting('delivery_info', 'Domicilios en Guaranda. Consulta zona y costo por WhatsApp.');
+$instagram = trim(setting('instagram', ''));
+$waNumber  = trim(setting('whatsapp_orders', ''));
+$customer  = current_customer();
 $required  = max(1, (int)setting('stamps_required', '10'));
 $reward    = setting('reward_text', 'caldo de salchicha gratis');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    csrf_verify();
-    $action = $_POST['action'] ?? '';
+$waLink = $waNumber !== ''
+    ? wa_link($waNumber, '¡Hola ' . $business . '! Quiero hacer un pedido 🍲')
+    : '';
 
-    if ($action === 'login') {
-        $tab = 'login';
-        $loginPhone = trim((string)($_POST['phone'] ?? ''));
-        $pin        = (string)($_POST['pin'] ?? '');
-        $customer   = find_customer($loginPhone);
-
-        if (!$customer || !verify_customer_pin($customer, $pin)) {
-            usleep(400000);
-            $errors[] = 'Celular o PIN incorrecto.';
-        } else {
-            login_customer((int)$customer['id']);
-            flash('ok', '¡Hola de nuevo, ' . $customer['name'] . '!');
-            redirect('card.php');
-        }
-    } elseif ($action === 'register') {
-        $tab      = 'registro';
-        $regName  = trim((string)($_POST['name'] ?? ''));
-        $regPhone = trim((string)($_POST['phone'] ?? ''));
-        $referral = trim((string)($_POST['referral'] ?? ''));
-        $result   = register_customer(
-            $regName,
-            $regPhone,
-            (string)($_POST['pin'] ?? ''),
-            $_POST['birthday'] ?? null,
-            $referral,
-            isset($_POST['opt_in']),
-            (string)($_POST['document'] ?? '')
-        );
-
-        if ($result['ok']) {
-            login_customer((int)$result['id']);
-            flash('ok', '¡Bienvenido! Ya tienes tu tarjeta digital.');
-            redirect('card.php');
-        }
-        $errors[] = $result['error'];
-    }
-}
-
-page_start('Tarjeta de fidelidad', 'public');
+page_start('Inicio', 'public');
 ?>
-<section class="hero">
-    <span class="pill">Programa de fidelidad</span>
-    <h1>Compra <?= e((string)$required) ?> y el siguiente<br><em>va gratis</em>.</h1>
-    <p class="lead">
-        Cada visita suma un sello en tu tarjeta digital. Al completar <?= e((string)$required) ?>
-        te llevas <strong><?= e($reward) ?></strong>. Sin tarjetas de cartón y sin instalar nada.
-    </p>
+<section class="hero hero-home">
+    <div class="hero-copy">
+        <span class="pill"><?= e($address) ?></span>
+        <h1>El caldo de salchicha<br><em>hecho con amor</em></h1>
+        <p class="lead"><?= e($heroText) ?></p>
 
-    <div class="stamp-preview" aria-hidden="true">
-        <?php for ($i = 1; $i <= $required; $i++): ?>
-            <span class="stamp <?= $i <= 3 ? 'on' : '' ?>"><?= $i <= 3 ? '🍲' : $i ?></span>
-        <?php endfor; ?>
+        <div class="btn-row">
+            <?php if ($waLink !== ''): ?>
+                <a class="btn btn-primary" target="_blank" rel="noopener" href="<?= e($waLink) ?>">Pedir por WhatsApp 🍲</a>
+            <?php endif; ?>
+            <a class="btn btn-dark" href="<?= e(url($customer ? 'card.php' : 'tarjeta.php')) ?>">
+                <?= $customer ? 'Ver mi tarjeta' : 'Tener mi tarjeta' ?>
+            </a>
+        </div>
+
+        <p class="promo-note">🎁 Compra <?= e((string)$required) ?> caldos y el siguiente <strong>va gratis</strong>.</p>
     </div>
+
+    <figure class="hero-flyer">
+        <img src="<?= e(url('assets/afiche-caldo.jpeg')) ?>" alt="Afiche de <?= e($business) ?>: caldo de salchicha" width="452" height="640" loading="eager">
+        <figcaption><?= e($tagline) ?></figcaption>
+    </figure>
+</section>
+
+<section class="feature-grid">
+    <article class="feature">
+        <span>🔥</span>
+        <h3>Calentito y nutritivo</h3>
+        <p>Perfecto para días fríos, almuerzos y para compartir en familia.</p>
+    </article>
+    <article class="feature">
+        <span>🌿</span>
+        <h3>Ingredientes seleccionados</h3>
+        <p>Salchicha tradicional de calidad y sazón casera.</p>
+    </article>
+    <article class="feature">
+        <span>💛</span>
+        <h3>Hecho en casa</h3>
+        <p>Simple, casero y preparado con cariño para ti.</p>
+    </article>
 </section>
 
 <div class="grid-2">
     <section class="card">
-        <h2><?= $tab === 'login' ? 'Ya soy cliente' : 'Crear mi tarjeta' ?></h2>
-
-        <?php if ($tab === 'login'): ?>
-            <form method="post" class="form">
-                <?= csrf_field() ?>
-                <input type="hidden" name="action" value="login">
-                <label class="field">
-                    <span>Celular</span>
-                    <input class="input" type="tel" name="phone" value="<?= e($loginPhone) ?>" placeholder="300 123 4567" required autocomplete="tel">
-                </label>
-                <label class="field">
-                    <span>PIN</span>
-                    <input class="input" type="password" name="pin" inputmode="numeric" pattern="\d{4,6}" maxlength="6" placeholder="••••" required autocomplete="current-password">
-                </label>
-                <button class="btn btn-primary btn-block" type="submit">Entrar a mi tarjeta</button>
-            </form>
-            <p class="muted center">¿Primera vez? <a href="<?= e(url('index.php?tab=registro' . ($referral !== '' ? '&ref=' . urlencode($referral) : ''))) ?>">Crea tu tarjeta gratis</a></p>
+        <span class="pill">Nuestro menú</span>
+        <h2 style="margin-top:10px">Caldo de salchicha</h2>
+        <div class="menu-line">
+            <span>Porción para llevar</span>
+            <strong><?= e($price) ?></strong>
+        </div>
+        <p class="muted"><?= e($tagline) ?></p>
+        <?php if ($waLink !== ''): ?>
+            <a class="btn btn-primary btn-block" target="_blank" rel="noopener" href="<?= e($waLink) ?>">Pedir ahora</a>
         <?php else: ?>
-            <form method="post" class="form">
-                <?= csrf_field() ?>
-                <input type="hidden" name="action" value="register">
-                <label class="field">
-                    <span>Nombre</span>
-                    <input class="input" type="text" name="name" value="<?= e($regName) ?>" placeholder="Tu nombre" required maxlength="100">
-                </label>
-                <label class="field">
-                    <span>Celular (WhatsApp)</span>
-                    <input class="input" type="tel" name="phone" value="<?= e($regPhone) ?>" placeholder="300 123 4567" required autocomplete="tel">
-                </label>
-                <label class="field">
-                    <span>Cédula <small>(opcional)</small></span>
-                    <input class="input" type="text" name="document" inputmode="numeric" placeholder="1234567890" maxlength="15">
-                </label>
-                <label class="field">
-                    <span>PIN para entrar (4 a 6 números)</span>
-                    <input class="input" type="password" name="pin" inputmode="numeric" pattern="\d{4,6}" maxlength="6" placeholder="••••" required autocomplete="new-password">
-                </label>
-                <label class="field">
-                    <span>Cumpleaños <small>(opcional)</small></span>
-                    <input class="input" type="date" name="birthday">
-                </label>
-                <label class="field">
-                    <span>Código de un amigo <small>(opcional)</small></span>
-                    <input class="input" type="text" name="referral" value="<?= e($referral) ?>" placeholder="Ej. ABCD1234" maxlength="12" style="text-transform:uppercase">
-                </label>
-                <label class="check">
-                    <input type="checkbox" name="opt_in" checked>
-                    <span>Acepto recibir mi tarjeta y promociones por WhatsApp.</span>
-                </label>
-                <button class="btn btn-primary btn-block" type="submit">Crear mi tarjeta</button>
-            </form>
-            <p class="muted center">¿Ya tienes tarjeta? <a href="<?= e(url('index.php?tab=login')) ?>">Ingresa con tu PIN</a></p>
+            <a class="btn btn-primary btn-block" href="<?= e(url('tarjeta.php')) ?>">Quiero mi tarjeta de sellos</a>
         <?php endif; ?>
-
-        <?php foreach ($errors as $error): ?>
-            <div class="alert alert-error"><?= e($error) ?></div>
-        <?php endforeach; ?>
     </section>
 
     <section class="card card-soft">
-        <h2>Cómo funciona</h2>
-        <ol class="steps">
-            <li><strong>Regístrate</strong> con tu celular y crea un PIN.</li>
-            <li><strong>Muestra tu QR</strong> cada vez que compres; el mostrador suma tu sello.</li>
-            <li><strong>Completa <?= e((string)$required) ?></strong> y recibe tu código para el <?= e($reward) ?>.</li>
-            <li><strong>Entérate por WhatsApp</strong> de tus sellos, premios y promociones.</li>
-        </ol>
-        <p class="muted">Tus datos solo se usan para tu tarjeta y las promociones de <?= e($business) ?>.</p>
+        <span class="pill">Fidelidad</span>
+        <h2 style="margin-top:10px">Tu tarjeta de sellos</h2>
+        <p>Cada caldo suma un sello. Al completar <?= e((string)$required) ?>, tu <?= e($reward) ?> es gratis.</p>
+        <div class="stamp-preview">
+            <?php for ($i = 1; $i <= $required; $i++): ?>
+                <span class="stamp <?= $i <= 4 ? 'on' : '' ?>"><?= $i <= 4 ? '🍲' : $i ?></span>
+            <?php endfor; ?>
+        </div>
+        <a class="btn btn-dark btn-block" href="<?= e(url($customer ? 'card.php' : 'tarjeta.php?tab=registro')) ?>">
+            <?= $customer ? 'Ver mi tarjeta' : 'Empezar a sumar sellos' ?>
+        </a>
     </section>
 </div>
+
+<section class="card" id="contacto">
+    <h2>Visítanos</h2>
+    <div class="info-grid">
+        <div>
+            <span class="info-label">Dirección</span>
+            <p><?= e($address) ?></p>
+        </div>
+        <div>
+            <span class="info-label">Horario</span>
+            <p><?= e($hours) ?></p>
+        </div>
+        <div>
+            <span class="info-label">Domicilios</span>
+            <p><?= e($delivery) ?></p>
+        </div>
+        <div>
+            <span class="info-label">Pedidos</span>
+            <?php if ($waLink !== ''): ?>
+                <p><a target="_blank" rel="noopener" href="<?= e($waLink) ?>">Escríbenos por WhatsApp</a></p>
+            <?php else: ?>
+                <p class="muted">Próximamente</p>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <?php if ($instagram !== ''): ?>
+        <p class="muted">Síguenos:
+            <a target="_blank" rel="noopener" href="https://instagram.com/<?= e(ltrim($instagram, '@')) ?>">@<?= e(ltrim($instagram, '@')) ?></a>
+        </p>
+    <?php endif; ?>
+</section>
+
 <?php page_end(); ?>

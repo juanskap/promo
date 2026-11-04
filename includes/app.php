@@ -264,7 +264,7 @@ function require_customer(): array
 {
     $c = current_customer();
     if (!$c) {
-        redirect('index.php?tab=login');
+        redirect('tarjeta.php?tab=login');
     }
     return $c;
 }
@@ -748,8 +748,8 @@ function page_start(string $title, string $area = 'public'): void
             <a href="<?= e(url('card.php')) ?>">Mi tarjeta</a>
             <a class="nav-out" href="<?= e(url('logout.php')) ?>">Salir</a>
         <?php else: ?>
-            <a href="<?= e(url('index.php?tab=login')) ?>">Ingresar</a>
-            <a class="nav-cta" href="<?= e(url('index.php?tab=registro')) ?>">Registrarme</a>
+            <a href="<?= e(url('tarjeta.php?tab=login')) ?>">Mi tarjeta</a>
+            <a class="nav-cta" href="<?= e(url('tarjeta.php?tab=registro')) ?>">Registrarme</a>
         <?php endif; ?>
     </nav>
 </header>

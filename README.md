@@ -1,10 +1,14 @@
-# Tarjeta de fidelidad · Caldo de salchicha
+# Cabaña Delfina · Página web y tarjeta de fidelidad
 
-Aplicación web (PWA) para que un negocio de comidas registre clientes, sume sellos
-por cada compra y entregue un premio automático, avisando por WhatsApp.
+Sitio web del negocio (página principal) más una aplicación (PWA) para registrar
+clientes, sumar sellos por cada compra y entregar un premio automático, avisando
+por WhatsApp.
 
 ## Qué incluye
 
+- **Página principal:** presentación del negocio, afiche, menú y precio, programa
+  de fidelidad, horario, domicilios y contacto por WhatsApp. Se edita desde
+  `Admin → Ajustes → Página principal` sin tocar código.
 - **Clientes:** registro con celular + PIN, tarjeta digital de 10 sellos, QR personal,
   cupones, código de referido e historial.
 - **Mostrador:** registro de clientes, búsqueda por celular / cédula / código,
@@ -114,7 +118,8 @@ una vez al día:
 
 ```
 promo/
-├─ index.php            Registro e ingreso de clientes
+├─ index.php            Página principal del negocio (landing)
+├─ tarjeta.php          Registro e ingreso de clientes
 ├─ card.php             Tarjeta digital, QR y cupones
 ├─ staff/index.php      Mostrador: sellar, canjear, registrar
 ├─ admin/index.php      Panel de administración
@@ -122,6 +127,6 @@ promo/
 ├─ install.php          Instalador y creación de la base de datos
 ├─ config.php           Configuración (base de datos, URL)
 ├─ includes/app.php     Núcleo: BD, sesión, fidelidad, WhatsApp
-├─ assets/              Estilos, JS, PWA e icono
+├─ assets/              Estilos, JS, PWA, icono y afiche
 └─ data/                Base SQLite (no se sube al hosting)
 ```

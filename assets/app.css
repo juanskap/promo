@@ -554,3 +554,99 @@ details.card[open] summary { margin-bottom: 12px; }
     .qr-box img { width: 96px; height: 96px; }
     .coupon-code { font-size: 1.05rem; letter-spacing: 1.5px; }
 }
+
+/* Página principal ------------------------------------------------ */
+.hero-home {
+    display: grid;
+    gap: 26px;
+    align-items: center;
+    padding-top: 18px;
+}
+
+@media (min-width: 860px) {
+    .hero-home { grid-template-columns: 1.12fr .88fr; gap: 38px; }
+}
+
+.hero-copy .lead { font-size: 1.05rem; }
+
+.promo-note {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 10px 14px;
+    border: 1px dashed #e8b87f;
+    border-radius: 12px;
+    background: #fff3e2;
+    font-size: .92rem;
+}
+
+.hero-flyer { margin: 0; text-align: center; }
+
+.hero-flyer img {
+    width: 100%;
+    max-width: 370px;
+    border: 6px solid #fff;
+    border-radius: 20px;
+    box-shadow: 0 18px 40px rgba(80, 40, 10, .18);
+}
+
+.hero-flyer figcaption {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: .85rem;
+}
+
+.feature-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1fr;
+    margin: 26px 0 6px;
+}
+
+@media (min-width: 760px) {
+    .feature-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.feature {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 17px;
+}
+
+.feature > span { font-size: 1.5rem; }
+.feature h3 { margin: 6px 0 4px; font-size: 1rem; }
+.feature p { margin: 0; color: var(--muted); font-size: .9rem; }
+
+.menu-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    border-bottom: 1px dashed var(--line);
+    padding: 10px 0;
+    margin: 8px 0 12px;
+}
+
+.menu-line strong { font-size: 1.45rem; color: var(--brand); }
+
+.info-grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 700px) {
+    .info-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.info-label {
+    font-size: .71rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--muted);
+    font-weight: 800;
+}
+
+.info-grid p { margin: 4px 0 0; }
+
+textarea.input { min-height: 84px; resize: vertical; }

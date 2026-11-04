@@ -25,7 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'settings_save') {
         $textKeys = ['business_name', 'reward_text', 'country_code', 'currency', 'whatsapp_mode',
-                     'wa_cloud_token', 'wa_cloud_phone_id', 'milestones'];
+                     'wa_cloud_token', 'wa_cloud_phone_id', 'milestones', 'tagline', 'hero_text',
+                     'price_caldo', 'address', 'hours', 'delivery_info', 'whatsapp_orders', 'instagram'];
         foreach ($textKeys as $key) {
             if (isset($_POST[$key])) {
                 set_setting($key, trim((string)$_POST[$key]));
@@ -490,6 +491,42 @@ page_start('Administración', 'admin');
             <label class="check">
                 <input type="checkbox" name="notify_every_stamp" <?= setting('notify_every_stamp') === '1' ? 'checked' : '' ?>>
                 <span>Avisar por WhatsApp en cada sello (puede ser molesto; por defecto solo en los hitos).</span>
+            </label>
+
+            <h3>Página principal</h3>
+            <div class="grid-2 tight">
+                <label class="field">
+                    <span>Frase corta (debajo del afiche)</span>
+                    <input class="input" type="text" name="tagline" value="<?= e(setting('tagline')) ?>" maxlength="140">
+                </label>
+                <label class="field">
+                    <span>Precio del caldo</span>
+                    <input class="input" type="text" name="price_caldo" value="<?= e(setting('price_caldo')) ?>" maxlength="30">
+                </label>
+                <label class="field">
+                    <span>Dirección</span>
+                    <input class="input" type="text" name="address" value="<?= e(setting('address')) ?>" maxlength="140">
+                </label>
+                <label class="field">
+                    <span>Horario</span>
+                    <input class="input" type="text" name="hours" value="<?= e(setting('hours')) ?>" maxlength="140">
+                </label>
+                <label class="field">
+                    <span>WhatsApp para pedidos</span>
+                    <input class="input" type="tel" name="whatsapp_orders" value="<?= e(setting('whatsapp_orders')) ?>" placeholder="300 123 4567">
+                </label>
+                <label class="field">
+                    <span>Instagram (usuario)</span>
+                    <input class="input" type="text" name="instagram" value="<?= e(setting('instagram')) ?>" placeholder="cabanadelfina" maxlength="60">
+                </label>
+            </div>
+            <label class="field">
+                <span>Texto de presentación</span>
+                <textarea class="input" name="hero_text" rows="3" maxlength="400"><?= e(setting('hero_text')) ?></textarea>
+            </label>
+            <label class="field">
+                <span>Información de domicilios</span>
+                <input class="input" type="text" name="delivery_info" value="<?= e(setting('delivery_info')) ?>" maxlength="180">
             </label>
 
             <h3>WhatsApp</h3>

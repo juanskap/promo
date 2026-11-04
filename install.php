@@ -200,7 +200,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $defaults = [
-            'business_name'      => 'Mi Cabaña',
+            'business_name'      => 'Cabaña Delfina',
+            'tagline'            => 'Calentito, nutritivo y hecho con amor para ti',
+            'hero_text'          => 'Caldo de salchicha tradicional, casero y con ingredientes seleccionados. Ideal para días fríos, almuerzos y para compartir en familia.',
+            'price_caldo'        => '$3.500',
+            'address'            => 'Guaranda, Bolívar',
+            'hours'              => 'Sábados',
+            'delivery_info'      => 'Domicilios en Guaranda. Consulta zona y costo por WhatsApp.',
+            'whatsapp_orders'    => '',
+            'instagram'          => '',
             'reward_text'        => 'caldo de salchicha gratis',
             'stamps_required'    => '10',
             'milestones'         => '3,6,9',
