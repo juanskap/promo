@@ -650,3 +650,52 @@ details.card[open] summary { margin-bottom: 12px; }
 .info-grid p { margin: 4px 0 0; }
 
 textarea.input { min-height: 84px; resize: vertical; }
+
+/* Logo y aviso ----------------------------------------------------- */
+.brand-mark-logo {
+    background: #fff;
+    overflow: hidden;
+    padding: 0;
+}
+
+.brand-mark-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #fff;
+}
+
+.hero-logo {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 260px;
+    max-height: 110px;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(80, 40, 10, .14);
+    margin-bottom: 12px;
+}
+
+.notice-strip {
+    margin: 14px 0 0;
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #c2410c, #ea580c);
+    color: #fff;
+    font-weight: 700;
+    font-size: .89rem;
+    text-align: center;
+    box-shadow: 0 8px 18px rgba(194, 65, 12, .22);
+}
+
+.menu-extra {
+    font-size: 1.1rem;
+    color: var(--brand-2);
+}
+
+@media (max-width: 620px) {
+    .hero-logo { max-height: 84px; max-width: 200px; }
+    .notice-strip { font-size: .82rem; padding: 9px 12px; }
+}

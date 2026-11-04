@@ -180,7 +180,7 @@ function wa_number(string $phone): string
 {
     $digits = normalize_phone($phone);
     if (strlen($digits) <= 10) {
-        $digits = preg_replace('/\D+/', '', setting('country_code', '57')) . $digits;
+        $digits = preg_replace('/\D+/', '', setting('country_code', '593')) . $digits;
     }
     return $digits;
 }
@@ -715,6 +715,7 @@ function page_start(string $title, string $area = 'public'): void
     $business = setting('business_name', 'Mi Cabaña');
     $customer = current_customer();
     $staff    = current_staff();
+    $hasLogo  = is_file(dirname(__DIR__) . '/assets/logo.jpeg');
     ?>
 <!doctype html>
 <html lang="es">
@@ -730,7 +731,13 @@ function page_start(string $title, string $area = 'public'): void
 <body class="area-<?= e($area) ?>">
 <header class="topbar">
     <a class="brand" href="<?= e(url('index.php')) ?>">
-        <span class="brand-mark">🍲</span>
+        <span class="brand-mark<?= $hasLogo ? ' brand-mark-logo' : '' ?>">
+            <?php if ($hasLogo): ?>
+                <img src="<?= e(url('assets/logo.jpeg')) ?>" alt="Logo de <?= e($business) ?>">
+            <?php else: ?>
+                🍲
+            <?php endif; ?>
+        </span>
         <span class="brand-name"><?= e($business) ?></span>
     </a>
     <nav class="nav">

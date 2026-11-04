@@ -5,15 +5,20 @@ require __DIR__ . '/includes/app.php';
 $business  = setting('business_name', 'Cabaña Delfina');
 $tagline   = setting('tagline', 'Calentito, nutritivo y hecho con amor para ti');
 $heroText  = setting('hero_text', 'Caldo de salchicha tradicional, casero y con ingredientes seleccionados. Ideal para días fríos, almuerzos y para compartir en familia.');
-$price     = setting('price_caldo', '$3.500');
+$price     = setting('price_caldo', '$3.50');
 $address   = setting('address', 'Guaranda, Bolívar');
-$hours     = setting('hours', 'Sábados');
-$delivery  = setting('delivery_info', 'Domicilios en Guaranda. Consulta zona y costo por WhatsApp.');
+$hours     = setting('hours', 'Sábados y domingos');
+$delivery  = setting('delivery_info', 'Llevamos tu caldo calientito a domicilio en Guaranda.');
+$deliveryCost = setting('delivery_cost', '+$1,50');
+$addressNote  = setting('address_note', 'Estamos arreglando el local físico. Confirma el punto de entrega por WhatsApp.');
+$reservations = setting('reservations', 'Entre semana puedes reservar para eventos: cumpleaños, reuniones y pedidos grandes.');
+$notice    = setting('notice', 'Abrimos sábados y domingos · Entre semana, reservas para eventos');
 $instagram = trim(setting('instagram', ''));
 $waNumber  = trim(setting('whatsapp_orders', ''));
 $customer  = current_customer();
 $required  = max(1, (int)setting('stamps_required', '10'));
 $reward    = setting('reward_text', 'caldo de salchicha gratis');
+$hasLogo   = is_file(__DIR__ . '/assets/logo.jpeg');
 
 $waLink = $waNumber !== ''
     ? wa_link($waNumber, '¡Hola ' . $business . '! Quiero hacer un pedido 🍲')
@@ -21,8 +26,15 @@ $waLink = $waNumber !== ''
 
 page_start('Inicio', 'public');
 ?>
+<?php if ($notice !== ''): ?>
+    <div class="notice-strip">📍 <?= e($notice) ?></div>
+<?php endif; ?>
+
 <section class="hero hero-home">
     <div class="hero-copy">
+        <?php if ($hasLogo): ?>
+            <img class="hero-logo" src="<?= e(url('assets/logo.jpeg')) ?>" alt="Logo de <?= e($business) ?>" width="220" height="184">
+        <?php endif; ?>
         <span class="pill"><?= e($address) ?></span>
         <h1>El caldo de salchicha<br><em>hecho con amor</em></h1>
         <p class="lead"><?= e($heroText) ?></p>
@@ -71,6 +83,10 @@ page_start('Inicio', 'public');
             <span>Porción para llevar</span>
             <strong><?= e($price) ?></strong>
         </div>
+        <div class="menu-line">
+            <span>🛵 A domicilio</span>
+            <strong class="menu-extra"><?= e($deliveryCost) ?></strong>
+        </div>
         <p class="muted"><?= e($tagline) ?></p>
         <?php if ($waLink !== ''): ?>
             <a class="btn btn-primary btn-block" target="_blank" rel="noopener" href="<?= e($waLink) ?>">Pedir ahora</a>
@@ -100,6 +116,9 @@ page_start('Inicio', 'public');
         <div>
             <span class="info-label">Dirección</span>
             <p><?= e($address) ?></p>
+            <?php if ($addressNote !== ''): ?>
+                <p class="muted small"><?= e($addressNote) ?></p>
+            <?php endif; ?>
         </div>
         <div>
             <span class="info-label">Horario</span>
@@ -107,14 +126,17 @@ page_start('Inicio', 'public');
         </div>
         <div>
             <span class="info-label">Domicilios</span>
-            <p><?= e($delivery) ?></p>
+            <p><?= e($delivery) ?> <strong><?= e($deliveryCost) ?></strong></p>
         </div>
         <div>
-            <span class="info-label">Pedidos</span>
+            <span class="info-label">Pedidos y reservas</span>
             <?php if ($waLink !== ''): ?>
                 <p><a target="_blank" rel="noopener" href="<?= e($waLink) ?>">Escríbenos por WhatsApp</a></p>
             <?php else: ?>
                 <p class="muted">Próximamente</p>
+            <?php endif; ?>
+            <?php if ($reservations !== ''): ?>
+                <p class="muted small"><?= e($reservations) ?></p>
             <?php endif; ?>
         </div>
     </div>

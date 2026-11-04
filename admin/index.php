@@ -26,7 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'settings_save') {
         $textKeys = ['business_name', 'reward_text', 'country_code', 'currency', 'whatsapp_mode',
                      'wa_cloud_token', 'wa_cloud_phone_id', 'milestones', 'tagline', 'hero_text',
-                     'price_caldo', 'address', 'hours', 'delivery_info', 'whatsapp_orders', 'instagram'];
+                     'price_caldo', 'address', 'hours', 'delivery_info', 'whatsapp_orders', 'instagram',
+                     'delivery_cost', 'notice', 'address_note', 'reservations'];
         foreach ($textKeys as $key) {
             if (isset($_POST[$key])) {
                 set_setting($key, trim((string)$_POST[$key]));
@@ -481,7 +482,7 @@ page_start('Administración', 'admin');
                 </label>
                 <label class="field">
                     <span>Código de país (WhatsApp)</span>
-                    <input class="input" type="text" name="country_code" value="<?= e(setting('country_code', '57')) ?>" maxlength="4">
+                    <input class="input" type="text" name="country_code" value="<?= e(setting('country_code', '593')) ?>" maxlength="4">
                 </label>
                 <label class="field">
                     <span>Símbolo de moneda</span>
@@ -519,6 +520,14 @@ page_start('Administración', 'admin');
                     <span>Instagram (usuario)</span>
                     <input class="input" type="text" name="instagram" value="<?= e(setting('instagram')) ?>" placeholder="cabanadelfina" maxlength="60">
                 </label>
+                <label class="field">
+                    <span>Costo de domicilio</span>
+                    <input class="input" type="text" name="delivery_cost" value="<?= e(setting('delivery_cost')) ?>" placeholder="+$1,50" maxlength="30">
+                </label>
+                <label class="field">
+                    <span>Aviso destacado (franja superior)</span>
+                    <input class="input" type="text" name="notice" value="<?= e(setting('notice')) ?>" placeholder="Abrimos sábados y domingos" maxlength="180">
+                </label>
             </div>
             <label class="field">
                 <span>Texto de presentación</span>
@@ -527,6 +536,14 @@ page_start('Administración', 'admin');
             <label class="field">
                 <span>Información de domicilios</span>
                 <input class="input" type="text" name="delivery_info" value="<?= e(setting('delivery_info')) ?>" maxlength="180">
+            </label>
+            <label class="field">
+                <span>Nota de dirección</span>
+                <input class="input" type="text" name="address_note" value="<?= e(setting('address_note')) ?>" placeholder="Local en arreglos; confirma el punto por WhatsApp" maxlength="180">
+            </label>
+            <label class="field">
+                <span>Reservas entre semana</span>
+                <input class="input" type="text" name="reservations" value="<?= e(setting('reservations')) ?>" maxlength="180">
             </label>
 
             <h3>WhatsApp</h3>
