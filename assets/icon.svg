@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Caldo de salchicha">
+    <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#fbbf24"/>
+            <stop offset="1" stop-color="#ea580c"/>
+        </linearGradient>
+    </defs>
+    <rect width="512" height="512" rx="112" fill="url(#g)"/>
+    <g fill="#ffffff">
+        <path d="M146 272h220a10 10 0 0 1 10 10c0 68-52 120-120 120s-120-52-120-120a10 10 0 0 1 10-10z"/>
+        <rect x="126" y="238" width="260" height="36" rx="18"/>
+        <circle cx="256" cy="336" r="24" fill="#ea580c"/>
+    </g>
+    <g fill="none" stroke="#ffffff" stroke-width="15" stroke-linecap="round" opacity=".92">
+        <path d="M208 196c-18-20 18-34 0-56"/>
+        <path d="M256 192c-18-20 18-34 0-56"/>
+        <path d="M304 196c-18-20 18-34 0-56"/>
+    </g>
+</svg>

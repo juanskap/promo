@@ -1,0 +1,6 @@
+# Evita listar archivos y bloquea la base de datos y la configuración.
+Options -Indexes
+
+<FilesMatch "^(config\.php)$">
+    Require all denied
+</FilesMatch>

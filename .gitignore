@@ -1,0 +1,6 @@
+/data/*.sqlite
+/data/*.sqlite-*
+/data/.installed
+/data/*.log
+.DS_Store
+Thumbs.db
