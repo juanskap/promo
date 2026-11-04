@@ -146,6 +146,18 @@ page_start('Inicio', 'public');
             <a target="_blank" rel="noopener" href="https://instagram.com/<?= e(ltrim($instagram, '@')) ?>">@<?= e(ltrim($instagram, '@')) ?></a>
         </p>
     <?php endif; ?>
+
+    <?php if ($waLink !== ''): ?>
+        <div class="btn-row">
+            <a class="btn btn-primary" target="_blank" rel="noopener"
+               href="<?= e(wa_link($waNumber, '¡Hola ' . $business . '! Quiero reservar para un evento 🎉')) ?>">
+                Reservar para un evento
+            </a>
+            <a class="btn btn-ghost" target="_blank" rel="noopener" href="<?= e($waLink) ?>">
+                Pedir a domicilio
+            </a>
+        </div>
+    <?php endif; ?>
 </section>
 
 <?php page_end(); ?>
