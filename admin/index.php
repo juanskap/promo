@@ -548,7 +548,7 @@ page_start('Administración', 'admin');
         <section class="card">
             <div class="row-between">
                 <h2>Productos (<?= count($menuAll) ?>)</h2>
-                <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="<?= e(url('index.php#menu')) ?>">Ver en el sitio</a>
+                <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="<?= e(url('menu.php')) ?>">Ver en el sitio</a>
             </div>
             <?php if (!$menuAll): ?>
                 <p class="muted">Todavía no hay productos. Agrega el primero con el formulario.</p>

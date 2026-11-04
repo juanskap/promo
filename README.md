@@ -6,13 +6,13 @@ por WhatsApp.
 
 ## Qué incluye
 
-- **Página principal:** sitio completo de una sola página con Inicio, Nuestro Menú,
-  Cabaña Delfina, Envíos a domicilio, Ubicación y Contacto, preguntas frecuentes y
-  la tarjeta de sellos. Los textos se editan desde `Admin → Ajustes` sin tocar código.
+- **Páginas del sitio:** Inicio, Nuestro Menú, Cabaña Delfina, Envíos a Domicilio y
+  Ubicación y Contacto, cada una con su propia dirección y pestaña activa. Los textos
+  se editan desde `Admin → Ajustes` sin tocar código.
 - **Menú con fotos:** cada plato tiene nombre, categoría, precio (texto libre, admite
-  “Tu precio”), descripción, orden y foto. Se administra desde `Admin → Menú`, que
-  permite agregar, editar, ocultar, eliminar y subir la imagen (JPG, PNG o WEBP
-  hasta 4 MB).
+  “Tu precio”), descripción, orden y foto. Los cortes se muestran con papas, ensalada
+  y chimichurri. Se administra desde `Admin → Menú`, que permite agregar, editar,
+  ocultar, eliminar y subir la imagen (JPG, PNG o WEBP hasta 4 MB).
 - **Clientes:** registro con celular + PIN, tarjeta digital de 10 sellos, QR personal,
   cupones, código de referido e historial.
 - **Mostrador:** registro de clientes, búsqueda por celular / cédula / código,
@@ -63,18 +63,21 @@ C:\xampp\php\php.exe -S localhost:8000 -t C:\xampp\htdocs
 > La clave del cliente es el **celular**, porque es el canal de WhatsApp.
 > La **cédula** es un dato opcional de apoyo para evitar duplicados e identificarlo.
 
-## Página principal y menú
+## Páginas del sitio y menú
 
-`index.php` es la portada del negocio y muestra:
+El sitio está dividido en páginas independientes, cada una con su propia dirección:
 
-| Sección | Ancla | Contenido |
+| Pestaña | Archivo | Contenido |
 | --- | --- | --- |
-| Inicio | `#inicio` | Portada, plato estrella, precio, horario y botón de WhatsApp |
-| Nuestro Menú | `#menu` | Platos agrupados por categoría, con foto y precio |
-| Envíos | `#envios` | Costo de domicilio **$1.00 por pedido** y ejemplos |
-| Cabaña Delfina | `#cabana` | Espacio tranquilo en Alpachaca y reservas |
-| Ubicación y Contacto | `#contacto` | Dirección, horario, WhatsApp y mapa |
-| Preguntas frecuentes | `#preguntas` | Dudas sobre envíos, horarios y tarjeta |
+| Inicio | `index.php` | Portada, plato estrella, vista rápida del menú, tarjeta de sellos y resumen de la cabaña |
+| Nuestro Menú | `menu.php` | Platos agrupados por categoría, con foto, precio y botón de pedido |
+| Cabaña Delfina | `cabana.php` | Espacio tranquilo en Alpachaca, características y reservas |
+| Envíos a Domicilio | `envios.php` | Costo de domicilio **$1.00 por pedido**, ejemplos y pasos para pedir |
+| Ubicación y Contacto | `contacto.php` | Dirección, horario, WhatsApp, mapa y preguntas frecuentes |
+| Mi tarjeta | `tarjeta.php` / `card.php` | Registro, ingreso y tarjeta de sellos del cliente |
+
+La barra superior marca con fondo la pestaña activa. Los datos compartidos del sitio
+(WhatsApp, precios, horario, textos) se calculan en `includes/site.php`.
 
 Los platos viven en la tabla `menu_items`. Desde **Admin → Menú** puedes:
 
@@ -146,7 +149,11 @@ una vez al día:
 
 ```
 promo/
-├─ index.php            Página principal del negocio (landing)
+├─ index.php            Inicio del negocio
+├─ menu.php            Menú completo con fotos y precios
+├─ cabana.php          Cabaña Delfina y reservas
+├─ envios.php          Envíos a domicilio
+├─ contacto.php        Ubicación, contacto y preguntas frecuentes
 ├─ tarjeta.php          Registro e ingreso de clientes
 ├─ card.php             Tarjeta digital, QR y cupones
 ├─ staff/index.php      Mostrador: sellar, canjear, registrar
@@ -155,6 +162,7 @@ promo/
 ├─ install.php          Instalador y creación de la base de datos
 ├─ config.php           Configuración (base de datos, URL)
 ├─ includes/app.php     Núcleo: BD, sesión, fidelidad, WhatsApp
+├─ includes/site.php    Datos compartidos de las páginas públicas
 ├─ assets/              Estilos, JS, PWA e icono
 │  └─ menu/             Fotos de los platos (editables desde Admin → Menú)
 └─ data/                Base SQLite (no se sube al hosting)

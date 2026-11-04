@@ -265,11 +265,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!(int)q('SELECT COUNT(*) FROM menu_items')->fetchColumn()) {
             $seedItems = [
                 ['Caldos', 'Caldo de salchicha', 'Receta tradicional con salchicha de calidad, papas, maíz y sazón casera. Calientito y para llevar.', '$3.50', 'assets/menu/caldo.jpg', 1],
-                ['Cortes a la parrilla', 'Costilla a la parrilla', 'Corte de chancho a la parrilla, jugoso y con sabor ahumado.', 'Consultar', 'assets/menu/costilla.jpg', 1],
-                ['Cortes a la parrilla', 'Pierna a la parrilla', 'Pierna de chancho marinada y asada a la parrilla.', 'Consultar', 'assets/menu/pierna.jpg', 2],
-                ['Cortes a la parrilla', 'Espaldilla a la parrilla', 'Espaldilla de chancho, suave por dentro y dorada por fuera.', 'Consultar', 'assets/menu/espaldilla.jpg', 3],
-                ['Cortes a la parrilla', 'Chuleta a la parrilla', 'Chuleta de chancho con el punto exacto de la parrilla.', 'Consultar', 'assets/menu/chuleta.jpg', 4],
-                ['Cortes a la parrilla', 'Panza a la parrilla', 'Panza de chancho crocante y llena de sabor.', 'Consultar', 'assets/menu/panza.jpg', 5],
+                ['Cortes a la parrilla', 'Costilla a la parrilla', 'Corte de chancho a la parrilla, jugoso y con sabor ahumado. Con papas, ensalada y chimichurri.', 'Consultar', 'assets/menu/costilla.jpg', 1],
+                ['Cortes a la parrilla', 'Pierna a la parrilla', 'Pierna de chancho marinada y asada a la parrilla. Con papas, ensalada y chimichurri.', 'Consultar', 'assets/menu/pierna.jpg', 2],
+                ['Cortes a la parrilla', 'Espaldilla a la parrilla', 'Espaldilla de chancho, suave por dentro y dorada por fuera. Con papas, ensalada y chimichurri.', 'Consultar', 'assets/menu/espaldilla.jpg', 3],
+                ['Cortes a la parrilla', 'Chuleta a la parrilla', 'Chuleta de chancho con el punto exacto de la parrilla. Con papas, ensalada y chimichurri.', 'Consultar', 'assets/menu/chuleta.jpg', 4],
+                ['Cortes a la parrilla', 'Panza a la parrilla', 'Panza de chancho crocante y llena de sabor. Con papas, ensalada y chimichurri.', 'Consultar', 'assets/menu/panza.jpg', 5],
             ];
             foreach ($seedItems as $item) {
                 q(

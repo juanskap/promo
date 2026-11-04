@@ -739,7 +739,7 @@ function pending_notifications(int $limit = 100): array
  *  Layout
  * ------------------------------------------------------------------ */
 
-function page_start(string $title, string $area = 'public'): void
+function page_start(string $title, string $area = 'public', string $current = ''): void
 {
     $business = setting('business_name', 'Mi Cabaña');
     $customer = current_customer();
@@ -781,11 +781,18 @@ function page_start(string $title, string $area = 'public'): void
             <a href="<?= e(url('admin/index.php')) ?>">Admin</a>
             <a class="nav-out" href="<?= e(url('staff/logout.php')) ?>">Salir</a>
         <?php elseif ($area === 'home'): ?>
-            <a href="#inicio">Inicio</a>
-            <a href="#menu">Menú</a>
-            <a href="#cabana">Cabaña Delfina</a>
-            <a href="#envios">Envíos</a>
-            <a href="#contacto">Contacto</a>
+            <?php
+            $publicNav = [
+                'inicio'   => ['Inicio', 'index.php'],
+                'menu'     => ['Nuestro Menú', 'menu.php'],
+                'cabana'   => ['Cabaña Delfina', 'cabana.php'],
+                'envios'   => ['Envíos a Domicilio', 'envios.php'],
+                'contacto' => ['Ubicación y Contacto', 'contacto.php'],
+            ];
+            ?>
+            <?php foreach ($publicNav as $key => $link): ?>
+                <a href="<?= e(url($link[1])) ?>"<?= $current === $key ? ' class="active" aria-current="page"' : '' ?>><?= e($link[0]) ?></a>
+            <?php endforeach; ?>
             <a class="nav-cta" href="<?= e(url($customer ? 'card.php' : 'tarjeta.php')) ?>">Mi tarjeta</a>
         <?php elseif ($customer): ?>
             <a href="<?= e(url('card.php')) ?>">Mi tarjeta</a>

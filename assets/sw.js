@@ -1,4 +1,4 @@
-const CACHE = 'promo-v1';
+const CACHE = 'promo-v2';
 const ASSETS = ['app.css', 'app.js', 'icon.svg'];
 
 self.addEventListener('install', (event) => {
