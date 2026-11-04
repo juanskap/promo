@@ -79,6 +79,17 @@ function schema_statements(string $driver): array
                 k TEXT PRIMARY KEY,
                 v TEXT NOT NULL
             )",
+            "CREATE TABLE IF NOT EXISTS menu_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL DEFAULT 'Caldos',
+                name TEXT NOT NULL,
+                description TEXT NULL,
+                price TEXT NOT NULL,
+                image TEXT NULL,
+                active INTEGER NOT NULL DEFAULT 1,
+                position INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL
+            )",
         ];
     }
 
@@ -146,6 +157,17 @@ function schema_statements(string $driver): array
             k VARCHAR(50) PRIMARY KEY,
             v TEXT NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+        "CREATE TABLE IF NOT EXISTS menu_items (
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            category VARCHAR(60) NOT NULL DEFAULT 'Caldos',
+            name VARCHAR(120) NOT NULL,
+            description VARCHAR(255) NULL,
+            price VARCHAR(30) NOT NULL,
+            image VARCHAR(255) NULL,
+            active TINYINT(1) NOT NULL DEFAULT 1,
+            position INT NOT NULL DEFAULT 0,
+            created_at DATETIME NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
     ];
 }
 
@@ -198,19 +220,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (Throwable $e) {
             // La columna ya existe.
         }
+        try {
+            $pdo->exec('ALTER TABLE menu_items ADD COLUMN image ' . ($driver === 'sqlite' ? 'TEXT NULL' : 'VARCHAR(255) NULL'));
+        } catch (Throwable $e) {
+            // La columna ya existe.
+        }
 
         $defaults = [
             'business_name'      => 'Cabaña Delfina',
-            'tagline'            => 'Calentito, nutritivo y hecho con amor para ti',
-            'hero_text'          => 'Caldo de salchicha tradicional, casero y con ingredientes seleccionados. Ideal para días fríos, almuerzos y para compartir en familia.',
+            'tagline'            => 'Tradición viva — calentito, nutritivo y delicioso',
+            'hero_text'          => 'Receta tradicional, ingredientes seleccionados y el sabor de nuestra tierra. Hecho con amor para ti.',
             'price_caldo'        => '$3.50',
-            'address'            => 'Guaranda, Bolívar',
+            'address'            => 'Alpachaca, Guaranda — Bolívar',
             'hours'              => 'Sábados y domingos',
-            'delivery_info'      => 'Llevamos tu caldo calientito a domicilio en Guaranda.',
-            'delivery_cost'      => '+$1,50',
-            'address_note'       => 'Estamos arreglando el local físico. Confirma el punto de entrega por WhatsApp.',
-            'reservations'       => 'Entre semana puedes reservar para eventos: cumpleaños, reuniones y pedidos grandes.',
-            'notice'             => 'Abrimos sábados y domingos · Entre semana, reservas para eventos',
+            'delivery_info'      => 'Entregamos dentro de Guaranda. Haz tu pedido con anticipación por WhatsApp.',
+            'delivery_cost'      => '+$1.00',
+            'address_note'       => 'Consulta la ubicación exacta y la disponibilidad por WhatsApp.',
+            'reservations'       => 'Reserva con anticipación para eventos, reuniones y pedidos grandes.',
+            'notice'             => 'Abrimos fines de semana: sábados y domingos',
+            'about_title'        => 'Un rincón tranquilo en Alpachaca',
+            'about_text'         => 'Cabaña Delfina es un espacio rodeado de naturaleza para descansar, compartir en familia y disfrutar de un buen caldo. Consulta disponibilidad y tarifas por WhatsApp.',
+            'about_features'     => "Espacio tranquilo rodeado de naturaleza\nIdeal para desconectarse y descansar\nReservas y disponibilidad por WhatsApp",
             'whatsapp_orders'    => '',
             'instagram'          => '',
             'reward_text'        => 'caldo de salchicha gratis',
@@ -229,6 +259,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($defaults as $key => $value) {
             if (!q('SELECT 1 FROM settings WHERE k = ?', [$key])->fetchColumn()) {
                 q('INSERT INTO settings (k, v) VALUES (?, ?)', [$key, $value]);
+            }
+        }
+
+        if (!(int)q('SELECT COUNT(*) FROM menu_items')->fetchColumn()) {
+            $seedItems = [
+                ['Caldos', 'Caldo de salchicha', 'Receta tradicional con salchicha de calidad, papas, maíz y sazón casera. Calientito y para llevar.', '$3.50', 'assets/menu/caldo.jpg', 1],
+                ['Cortes a la parrilla', 'Costilla a la parrilla', 'Corte de chancho a la parrilla, jugoso y con sabor ahumado.', 'Consultar', 'assets/menu/costilla.jpg', 1],
+                ['Cortes a la parrilla', 'Pierna a la parrilla', 'Pierna de chancho marinada y asada a la parrilla.', 'Consultar', 'assets/menu/pierna.jpg', 2],
+                ['Cortes a la parrilla', 'Espaldilla a la parrilla', 'Espaldilla de chancho, suave por dentro y dorada por fuera.', 'Consultar', 'assets/menu/espaldilla.jpg', 3],
+                ['Cortes a la parrilla', 'Chuleta a la parrilla', 'Chuleta de chancho con el punto exacto de la parrilla.', 'Consultar', 'assets/menu/chuleta.jpg', 4],
+                ['Cortes a la parrilla', 'Panza a la parrilla', 'Panza de chancho crocante y llena de sabor.', 'Consultar', 'assets/menu/panza.jpg', 5],
+            ];
+            foreach ($seedItems as $item) {
+                q(
+                    'INSERT INTO menu_items (category, name, description, price, image, active, position, created_at)
+                     VALUES (?, ?, ?, ?, ?, 1, ?, ?)',
+                    [$item[0], $item[1], $item[2], $item[3], $item[4], $item[5], now()]
+                );
             }
         }
 

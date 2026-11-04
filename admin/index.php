@@ -9,6 +9,7 @@ $tabs  = [
     'clientes'  => 'Clientes',
     'cupones'   => 'Cupones',
     'mensajes'  => 'Mensajes',
+    'menu'      => 'Menú',
     'ajustes'   => 'Ajustes',
     'equipo'    => 'Equipo',
 ];
@@ -27,7 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $textKeys = ['business_name', 'reward_text', 'country_code', 'currency', 'whatsapp_mode',
                      'wa_cloud_token', 'wa_cloud_phone_id', 'milestones', 'tagline', 'hero_text',
                      'price_caldo', 'address', 'hours', 'delivery_info', 'whatsapp_orders', 'instagram',
-                     'delivery_cost', 'notice', 'address_note', 'reservations'];
+                     'delivery_cost', 'notice', 'address_note', 'reservations',
+                     'about_title', 'about_text', 'about_features'];
         foreach ($textKeys as $key) {
             if (isset($_POST[$key])) {
                 set_setting($key, trim((string)$_POST[$key]));
@@ -39,6 +41,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         set_setting('notify_every_stamp', isset($_POST['notify_every_stamp']) ? '1' : '0');
         flash('ok', 'Ajustes guardados.');
         redirect('admin/index.php?tab=ajustes');
+    }
+
+    if ($action === 'menu_save') {
+        $id          = (int)($_POST['item_id'] ?? 0);
+        $name        = trim((string)($_POST['name'] ?? ''));
+        $category    = trim((string)($_POST['category'] ?? ''));
+        $description = trim((string)($_POST['description'] ?? ''));
+        $price       = trim((string)($_POST['price'] ?? ''));
+        $position    = (int)($_POST['position'] ?? 0);
+        $active      = isset($_POST['active']) ? 1 : 0;
+        $image       = trim((string)($_POST['image_current'] ?? ''));
+
+        if ($name === '' || $price === '') {
+            flash('error', 'El producto necesita nombre y precio.');
+        } else {
+            if (!empty($_FILES['image_file']['tmp_name']) && is_uploaded_file($_FILES['image_file']['tmp_name'])) {
+                $upload = $_FILES['image_file'];
+                if ((int)$upload['size'] > 4 * 1024 * 1024) {
+                    flash('error', 'La imagen no puede superar 4 MB.');
+                    redirect('admin/index.php?tab=menu');
+                }
+                $info = @getimagesize($upload['tmp_name']);
+                $extMap = [
+                    'image/jpeg' => 'jpg',
+                    'image/png'  => 'png',
+                    'image/webp' => 'webp',
+                ];
+                $mime = $info['mime'] ?? '';
+                if (!$info || !isset($extMap[$mime])) {
+                    flash('error', 'La imagen debe ser JPG, PNG o WEBP.');
+                    redirect('admin/index.php?tab=menu');
+                }
+                $imageDir = dirname(__DIR__) . '/assets/menu';
+                if (!is_dir($imageDir)) {
+                    mkdir($imageDir, 0775, true);
+                }
+                $fileName = 'menu-' . date('Ymd-His') . '-' . bin2hex(random_bytes(3)) . '.' . $extMap[$mime];
+                if (!move_uploaded_file($upload['tmp_name'], $imageDir . '/' . $fileName)) {
+                    flash('error', 'No se pudo guardar la imagen.');
+                    redirect('admin/index.php?tab=menu');
+                }
+                $image = 'assets/menu/' . $fileName;
+            }
+            if (isset($_POST['image_remove'])) {
+                $image = '';
+            }
+
+            $category = $category !== '' ? $category : 'Caldos';
+            if ($id > 0) {
+                q(
+                    'UPDATE menu_items SET category = ?, name = ?, description = ?, price = ?, image = ?, position = ?, active = ? WHERE id = ?',
+                    [$category, $name, $description, $price, $image !== '' ? $image : null, $position, $active, $id]
+                );
+                flash('ok', 'Producto actualizado.');
+            } else {
+                q(
+                    'INSERT INTO menu_items (category, name, description, price, image, position, active, created_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                    [$category, $name, $description, $price, $image !== '' ? $image : null, $position, $active, now()]
+                );
+                flash('ok', 'Producto agregado al menú.');
+            }
+        }
+        redirect('admin/index.php?tab=menu');
+    }
+
+    if ($action === 'menu_delete') {
+        q('DELETE FROM menu_items WHERE id = ?', [(int)($_POST['item_id'] ?? 0)]);
+        flash('ok', 'Producto eliminado del menú.');
+        redirect('admin/index.php?tab=menu');
+    }
+
+    if ($action === 'menu_toggle') {
+        q('UPDATE menu_items SET active = CASE WHEN active = 1 THEN 0 ELSE 1 END WHERE id = ?', [(int)($_POST['item_id'] ?? 0)]);
+        flash('ok', 'Disponibilidad del producto actualizada.');
+        redirect('admin/index.php?tab=menu');
     }
 
     if ($action === 'staff_add') {
@@ -194,6 +272,22 @@ if ($tab === 'clientes') {
     }
     $sql .= ' ORDER BY created_at DESC LIMIT 200';
     $customers = q($sql, $params)->fetchAll();
+}
+
+if ($tab === 'menu') {
+    $menuAll  = menu_items(false);
+    $editId   = (int)($_GET['edit'] ?? 0);
+    $editItem = null;
+    foreach ($menuAll as $menuRow) {
+        if ((int)$menuRow['id'] === $editId) {
+            $editItem = $menuRow;
+            break;
+        }
+    }
+    $categories = [];
+    foreach ($menuAll as $menuRow) {
+        $categories[trim((string)$menuRow['category']) ?: 'Caldos'] = true;
+    }
 }
 
 if ($tab === 'cupones') {
@@ -449,6 +543,122 @@ page_start('Administración', 'admin');
     </section>
 
 <?php /* ---------------------------------------------------------------- */ ?>
+<?php elseif ($tab === 'menu'): ?>
+    <div class="admin-menu-grid">
+        <section class="card">
+            <div class="row-between">
+                <h2>Productos (<?= count($menuAll) ?>)</h2>
+                <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="<?= e(url('index.php#menu')) ?>">Ver en el sitio</a>
+            </div>
+            <?php if (!$menuAll): ?>
+                <p class="muted">Todavía no hay productos. Agrega el primero con el formulario.</p>
+            <?php else: ?>
+                <div class="admin-menu-list">
+                    <?php foreach ($menuAll as $row): ?>
+                        <?php
+                        $rowImage   = trim((string)($row['image'] ?? ''));
+                        $rowImageOk = $rowImage !== '' && is_file(dirname(__DIR__) . '/' . $rowImage);
+                        ?>
+                        <div class="admin-menu-row<?= (int)$row['active'] ? '' : ' is-off' ?>">
+                            <div class="admin-menu-thumb">
+                                <?php if ($rowImageOk): ?>
+                                    <img src="<?= e(url($rowImage)) ?>" alt="">
+                                <?php else: ?>
+                                    <span>🍽️</span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="admin-menu-info">
+                                <strong><?= e((string)$row['name']) ?></strong>
+                                <small class="muted"><?= e((string)$row['category']) ?> · <?= e((string)$row['price']) ?> · orden <?= (int)$row['position'] ?></small>
+                                <span class="badge <?= (int)$row['active'] ? 'badge-active' : '' ?>"><?= (int)$row['active'] ? 'Visible' : 'Oculto' ?></span>
+                            </div>
+                            <div class="admin-menu-actions">
+                                <a class="btn btn-sm btn-ghost" href="<?= e(url('admin/index.php?tab=menu&edit=' . (int)$row['id'])) ?>">Editar</a>
+                                <form method="post" class="inline">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="action" value="menu_toggle">
+                                    <input type="hidden" name="item_id" value="<?= (int)$row['id'] ?>">
+                                    <button class="btn btn-sm btn-ghost" type="submit"><?= (int)$row['active'] ? 'Ocultar' : 'Mostrar' ?></button>
+                                </form>
+                                <form method="post" class="inline" onsubmit="return confirm('¿Eliminar este producto del menú?');">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="action" value="menu_delete">
+                                    <input type="hidden" name="item_id" value="<?= (int)$row['id'] ?>">
+                                    <button class="btn btn-sm btn-ghost" type="submit">Eliminar</button>
+                                </form>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+
+        <section class="card">
+            <h2><?= $editItem ? 'Editar producto' : 'Agregar producto' ?></h2>
+            <form method="post" enctype="multipart/form-data" class="form">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="menu_save">
+                <input type="hidden" name="item_id" value="<?= $editItem ? (int)$editItem['id'] : 0 ?>">
+                <input type="hidden" name="image_current" value="<?= e((string)($editItem['image'] ?? '')) ?>">
+
+                <label class="field">
+                    <span>Nombre del plato</span>
+                    <input class="input" type="text" name="name" required maxlength="120" value="<?= e((string)($editItem['name'] ?? '')) ?>" placeholder="Caldo de salchicha">
+                </label>
+                <div class="grid-2 tight">
+                    <label class="field">
+                        <span>Categoría</span>
+                        <input class="input" type="text" name="category" list="menu-categories" maxlength="60" value="<?= e((string)($editItem['category'] ?? 'Caldos')) ?>" placeholder="Caldos">
+                        <datalist id="menu-categories">
+                            <?php foreach (array_keys($categories) as $cat): ?>
+                                <option value="<?= e((string)$cat) ?>"></option>
+                            <?php endforeach; ?>
+                        </datalist>
+                    </label>
+                    <label class="field">
+                        <span>Precio (texto libre)</span>
+                        <input class="input" type="text" name="price" required maxlength="30" value="<?= e((string)($editItem['price'] ?? '')) ?>" placeholder="$3.50 o Tu precio">
+                    </label>
+                </div>
+                <label class="field">
+                    <span>Descripción corta</span>
+                    <textarea class="input" name="description" rows="2" maxlength="255" placeholder="Receta tradicional, calientito y para llevar."><?= e((string)($editItem['description'] ?? '')) ?></textarea>
+                </label>
+                <div class="grid-2 tight">
+                    <label class="field">
+                        <span>Orden</span>
+                        <input class="input" type="number" name="position" min="0" max="999" value="<?= (int)($editItem['position'] ?? 0) ?>">
+                    </label>
+                    <label class="check" style="align-self:end">
+                        <input type="checkbox" name="active" <?= (!$editItem || (int)$editItem['active']) ? 'checked' : '' ?>>
+                        <span>Visible en la página</span>
+                    </label>
+                </div>
+
+                <div class="field">
+                    <span>Foto del plato</span>
+                    <?php if ($editItem && trim((string)($editItem['image'] ?? '')) !== '' && is_file(dirname(__DIR__) . '/' . $editItem['image'])): ?>
+                        <img class="admin-image-preview" src="<?= e(url((string)$editItem['image'])) ?>" alt="Foto actual de <?= e((string)$editItem['name']) ?>">
+                        <label class="check">
+                            <input type="checkbox" name="image_remove">
+                            <span>Quitar la foto actual</span>
+                        </label>
+                    <?php endif; ?>
+                    <input class="input" type="file" name="image_file" accept="image/jpeg,image/png,image/webp">
+                    <small class="muted">JPG, PNG o WEBP · máximo 4 MB. Recomendado: horizontal 4:3.</small>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn btn-primary" type="submit"><?= $editItem ? 'Guardar cambios' : 'Agregar al menú' ?></button>
+                    <?php if ($editItem): ?>
+                        <a class="btn btn-ghost" href="<?= e(url('admin/index.php?tab=menu')) ?>">Cancelar</a>
+                    <?php endif; ?>
+                </div>
+            </form>
+        </section>
+    </div>
+
+<?php /* ---------------------------------------------------------------- */ ?>
 <?php elseif ($tab === 'ajustes'): ?>
     <section class="card">
         <h2>Reglas del programa</h2>
@@ -497,7 +707,7 @@ page_start('Administración', 'admin');
             <h3>Página principal</h3>
             <div class="grid-2 tight">
                 <label class="field">
-                    <span>Frase corta (debajo del afiche)</span>
+                    <span>Frase corta (portada)</span>
                     <input class="input" type="text" name="tagline" value="<?= e(setting('tagline')) ?>" maxlength="140">
                 </label>
                 <label class="field">
@@ -522,7 +732,7 @@ page_start('Administración', 'admin');
                 </label>
                 <label class="field">
                     <span>Costo de domicilio</span>
-                    <input class="input" type="text" name="delivery_cost" value="<?= e(setting('delivery_cost')) ?>" placeholder="+$1,50" maxlength="30">
+                    <input class="input" type="text" name="delivery_cost" value="<?= e(setting('delivery_cost')) ?>" placeholder="+$1.00" maxlength="30">
                 </label>
                 <label class="field">
                     <span>Aviso destacado (franja superior)</span>
@@ -544,6 +754,20 @@ page_start('Administración', 'admin');
             <label class="field">
                 <span>Reservas entre semana</span>
                 <input class="input" type="text" name="reservations" value="<?= e(setting('reservations')) ?>" maxlength="180">
+            </label>
+
+            <h3>Cabaña Delfina</h3>
+            <label class="field">
+                <span>Título de la sección</span>
+                <input class="input" type="text" name="about_title" value="<?= e(setting('about_title')) ?>" placeholder="Un rincón tranquilo en Alpachaca" maxlength="120">
+            </label>
+            <label class="field">
+                <span>Texto de la cabaña</span>
+                <textarea class="input" name="about_text" rows="3" maxlength="500"><?= e(setting('about_text')) ?></textarea>
+            </label>
+            <label class="field">
+                <span>Características (una por línea)</span>
+                <textarea class="input" name="about_features" rows="4" maxlength="500" placeholder="Espacio tranquilo rodeado de naturaleza&#10;Ideal para desconectarse y descansar"><?= e(setting('about_features')) ?></textarea>
             </label>
 
             <h3>WhatsApp</h3>

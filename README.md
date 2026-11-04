@@ -6,9 +6,13 @@ por WhatsApp.
 
 ## Qué incluye
 
-- **Página principal:** presentación del negocio, afiche, menú y precio, programa
-  de fidelidad, horario, domicilios y contacto por WhatsApp. Se edita desde
-  `Admin → Ajustes → Página principal` sin tocar código.
+- **Página principal:** sitio completo de una sola página con Inicio, Nuestro Menú,
+  Cabaña Delfina, Envíos a domicilio, Ubicación y Contacto, preguntas frecuentes y
+  la tarjeta de sellos. Los textos se editan desde `Admin → Ajustes` sin tocar código.
+- **Menú con fotos:** cada plato tiene nombre, categoría, precio (texto libre, admite
+  “Tu precio”), descripción, orden y foto. Se administra desde `Admin → Menú`, que
+  permite agregar, editar, ocultar, eliminar y subir la imagen (JPG, PNG o WEBP
+  hasta 4 MB).
 - **Clientes:** registro con celular + PIN, tarjeta digital de 10 sellos, QR personal,
   cupones, código de referido e historial.
 - **Mostrador:** registro de clientes, búsqueda por celular / cédula / código,
@@ -58,6 +62,30 @@ C:\xampp\php\php.exe -S localhost:8000 -t C:\xampp\htdocs
 
 > La clave del cliente es el **celular**, porque es el canal de WhatsApp.
 > La **cédula** es un dato opcional de apoyo para evitar duplicados e identificarlo.
+
+## Página principal y menú
+
+`index.php` es la portada del negocio y muestra:
+
+| Sección | Ancla | Contenido |
+| --- | --- | --- |
+| Inicio | `#inicio` | Portada, plato estrella, precio, horario y botón de WhatsApp |
+| Nuestro Menú | `#menu` | Platos agrupados por categoría, con foto y precio |
+| Envíos | `#envios` | Costo de domicilio **$1.00 por pedido** y ejemplos |
+| Cabaña Delfina | `#cabana` | Espacio tranquilo en Alpachaca y reservas |
+| Ubicación y Contacto | `#contacto` | Dirección, horario, WhatsApp y mapa |
+| Preguntas frecuentes | `#preguntas` | Dudas sobre envíos, horarios y tarjeta |
+
+Los platos viven en la tabla `menu_items`. Desde **Admin → Menú** puedes:
+
+- Agregar un plato nuevo con su foto.
+- Editar nombre, categoría, precio, descripción y orden.
+- Ocultarlo del sitio sin borrarlo (útil si un corte no hay ese día).
+- Eliminarlo definitivamente.
+
+Las imágenes se guardan en `assets/menu/`. Si un plato no tiene foto, la tarjeta
+muestra un ícono. El costo de envío y los textos de la portada se cambian en
+**Admin → Ajustes**.
 
 ## WhatsApp
 
@@ -127,6 +155,7 @@ promo/
 ├─ install.php          Instalador y creación de la base de datos
 ├─ config.php           Configuración (base de datos, URL)
 ├─ includes/app.php     Núcleo: BD, sesión, fidelidad, WhatsApp
-├─ assets/              Estilos, JS, PWA, icono y afiche
+├─ assets/              Estilos, JS, PWA e icono
+│  └─ menu/             Fotos de los platos (editables desde Admin → Menú)
 └─ data/                Base SQLite (no se sube al hosting)
 ```

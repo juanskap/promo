@@ -105,6 +105,35 @@ function set_setting(string $key, string $value): void
 }
 
 /* ------------------------------------------------------------------ *
+ *  Menú del negocio
+ * ------------------------------------------------------------------ */
+
+function menu_items(bool $onlyActive = true): array
+{
+    try {
+        $sql = 'SELECT * FROM menu_items';
+        if ($onlyActive) {
+            $sql .= ' WHERE active = 1';
+        }
+        $sql .= ' ORDER BY category ASC, position ASC, id ASC';
+        return q($sql)->fetchAll();
+    } catch (Throwable $e) {
+        // Instalación anterior sin la tabla del menú.
+        return [];
+    }
+}
+
+function menu_grouped(bool $onlyActive = true): array
+{
+    $grouped = [];
+    foreach (menu_items($onlyActive) as $item) {
+        $category = trim((string)$item['category']) !== '' ? (string)$item['category'] : 'Menú';
+        $grouped[$category][] = $item;
+    }
+    return $grouped;
+}
+
+/* ------------------------------------------------------------------ *
  *  Utilidades
  * ------------------------------------------------------------------ */
 
@@ -751,6 +780,13 @@ function page_start(string $title, string $area = 'public'): void
             <a href="<?= e(url('staff/index.php')) ?>">Mostrador</a>
             <a href="<?= e(url('admin/index.php')) ?>">Admin</a>
             <a class="nav-out" href="<?= e(url('staff/logout.php')) ?>">Salir</a>
+        <?php elseif ($area === 'home'): ?>
+            <a href="#inicio">Inicio</a>
+            <a href="#menu">Menú</a>
+            <a href="#cabana">Cabaña Delfina</a>
+            <a href="#envios">Envíos</a>
+            <a href="#contacto">Contacto</a>
+            <a class="nav-cta" href="<?= e(url($customer ? 'card.php' : 'tarjeta.php')) ?>">Mi tarjeta</a>
         <?php elseif ($customer): ?>
             <a href="<?= e(url('card.php')) ?>">Mi tarjeta</a>
             <a class="nav-out" href="<?= e(url('logout.php')) ?>">Salir</a>
